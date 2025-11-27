@@ -10,31 +10,36 @@
   <main class="container">
     <div class="toolbar">
       <div>
-        <h1>JSON Key 排序工具</h1>
-        <p class="desc">输入一个 JSON 或普通 JavaScript 对象（非数组），按优先级排序其键：特殊符号 > 数字 > 大写字母 > 小写字母 > 中文。</p>
+        <h1 data-i18n="title">JSON Key 排序工具</h1>
+        <p class="desc" data-i18n="description">输入一个 JSON 或普通 JavaScript 对象（非数组），按优先级排序其键：特殊符号 > 数字 > 大写字母 > 小写字母 > 中文。</p>
       </div>
       <div class="toolbar-right">
-        <button id="themeToggle" aria-label="切换主题">🌓 切换主题</button>
+        <select id="langSelect" aria-label="语言" data-i18n-label="langSelect">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
+        <button id="themeToggle" aria-label="切换主题" data-i18n="toggleTheme">🌓 切换主题</button>
       </div>
     </div>
 
     <section class="panel">
-      <label for="input">输入</label>
+      <label for="input" data-i18n="inputLabel">输入</label>
       <textarea id="input" placeholder="示例：\n{\n  a: 1,\n  'Z': 2,\n  你好: 3,\n  _x: 4,\n  '10': 5\n}\n或标准 JSON：\n{\n  \"a\": 1,\n  \"Z\": 2,\n  \"你好\": 3,\n  \"_x\": 4,\n  \"10\": 5\n}" autofocus></textarea>
       <div class="actions">
-        <button id="convert">转换并排序键</button>
-        <button id="format">美化输入</button>
+        <button id="convert" data-i18n="convertBtn">转换并排序键</button>
+        <button id="format" data-i18n="formatBtn">美化输入</button>
       </div>
       <div id="error" class="error" aria-live="polite"></div>
     </section>
 
     <section class="panel">
-      <label for="output">输出（已按规则排序的对象）</label>
+      <label for="output" data-i18n="outputLabel">输出（已按规则排序的对象）</label>
       <textarea id="output" readonly></textarea>
     </section>
   </main>
 
   <script src="sort.js"></script>
+  <script src="i18n.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

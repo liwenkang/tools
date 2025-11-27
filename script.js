@@ -50,6 +50,14 @@
     $themeToggle.addEventListener('click', toggleTheme);
   }
 
+  // 语言切换
+  const $langSelect = document.getElementById('langSelect');
+  if ($langSelect) {
+    $langSelect.addEventListener('change', () => {
+      window.I18N && window.I18N.setLanguage($langSelect.value);
+    });
+  }
+
   function doConvert() {
     showError("");
     try {
