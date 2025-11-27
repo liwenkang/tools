@@ -58,6 +58,22 @@
     });
   }
 
+  function highlightJSON(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/("[^"]*")\s*:/g, '<span class="hl-key">$1</span>:')
+      .replace(/:\s*("(?:[^"\\]|\\.)*")/g, ': <span class="hl-string">$1</span>')
+      .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="hl-number">$1</span>')
+      .replace(/:\s*(true|false)/g, ': <span class="hl-boolean">$1</span>')
+      .replace(/:\s*(null)/g, ': <span class="hl-null">$1</span>')
+      .replace(/([{}\[\],])/g, '<span class="hl-punctuation">$1</span>');
+  }
+  function updateHighlight(textarea, highlightLayer) {
+    if (!highlightLayer) return;
+    highlightLayer.innerHTML = highlightJSON(textarea.value) + '\n';
+    highlightLayer.scrollTop = textarea.scrollTop;
+    highlightLayer.scrollLeft = textarea.scrollLeft;
+  }
   function updateLineNums(textarea, gutter) {
     const lines = textarea.value.split('\n').length || 1;
     const nums = [];
@@ -67,14 +83,26 @@
   }
   const $inputLines = document.getElementById('input-lines');
   const $outputLines = document.getElementById('output-lines');
-  function attachLineEvents(textarea, gutter){
+  const $inputHighlight = document.getElementById('input-highlight');
+  const $outputHighlight = document.getElementById('output-highlight');
+  function attachLineEvents(textarea, gutter, highlightLayer){
     if(!textarea || !gutter) return;
-    textarea.addEventListener('input', ()=> updateLineNums(textarea, gutter));
-    textarea.addEventListener('scroll', ()=> { gutter.scrollTop = textarea.scrollTop; });
+    textarea.addEventListener('input', ()=> {
+      updateLineNums(textarea, gutter);
+      updateHighlight(textarea, highlightLayer);
+    });
+    textarea.addEventListener('scroll', ()=> {
+      gutter.scrollTop = textarea.scrollTop;
+      if(highlightLayer) {
+        highlightLayer.scrollTop = textarea.scrollTop;
+        highlightLayer.scrollLeft = textarea.scrollLeft;
+      }
+    });
     updateLineNums(textarea, gutter);
+    updateHighlight(textarea, highlightLayer);
   }
-  attachLineEvents($input, $inputLines);
-  attachLineEvents($output, $outputLines);
+  attachLineEvents($input, $inputLines, $inputHighlight);
+  attachLineEvents($output, $outputLines, $outputHighlight);
 
   function doConvert() {
     showError("");
@@ -92,10 +120,12 @@
       const jsonStr = window.Sorter.toSortedJSON(inputObj);
       $output.value = jsonStr;
       updateLineNums($output, $outputLines);
+      updateHighlight($output, $outputHighlight);
     } catch (err) {
       showError(err.message || String(err));
       $output.value = "";
       updateLineNums($output, $outputLines);
+      updateHighlight($output, $outputHighlight);
     }
   }
 
@@ -123,6 +153,7 @@
       // 美化但保持排序：重新生成排序后 JSON
       $input.value = window.Sorter.toSortedJSON(inputObj);
       updateLineNums($input, $inputLines);
+      updateHighlight($input, $inputHighlight);
     } catch (err) {
       showError("美化失败：" + (err.message || String(err)));
     }
