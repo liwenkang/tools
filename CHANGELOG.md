@@ -3,7 +3,17 @@
 ## Unreleased (2025-11-27)
 
 ## 新增
-- feat(ui): 输入/输出支持行号显示; fix(serializer): 移除 toSortedJSON 中遗留的 $ 占位符
+- feat(ui): 添加 JSON 语法高亮，支持键名、字符串、数字、布尔值、null 等着色
+- feat(ui): 改为左右分栏布局，输入输出框自适应页面高度并支持独立滚动
+
+## 修复
+- fix(ui): 行号区域底部留出空间避免遮挡横向滚动条
+- fix(ui): 增加编辑器底部内边距避免横向滚动条遮挡最后一行内容
+- fix(ui): 修复行号不显示问题，设置行号 z-index:2 确保在高亮层上方
+- fix(ui): 修复语法高亮显示问题，textarea 使用 color:transparent 并设置高亮层背景色
+- fix(ui): 修复行号区域滚动同步问题，设置 overflow-y:auto 并隐藏滚动条
+- fix(ui): 添加 html/body 高度 100% 确保全屏布局生效
+- fix(ui): 修复行号显示重复问题，优化行号格式化逻辑
 
 
 
