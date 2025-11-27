@@ -39,22 +39,23 @@ body {
   color: var(--text);
   transition: background var(--transition), color var(--transition);
 }
-.container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 0 16px; height: 100vh; display: flex; flex-direction: column; }
 h1 { margin: 0 0 8px; font-size: 22px; }
 .desc { margin: 0 0 16px; color: var(--muted); }
+.editor-container { display: flex; gap: 12px; flex: 1; min-height: 0; margin-bottom: 12px; }
 .panel {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 12px;
   transition: background var(--transition), border-color var(--transition);
 }
-label { display: block; font-weight: 600; margin-bottom: 8px; }
+.editor-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+label { display: block; font-weight: 600; margin-bottom: 8px; flex-shrink: 0; }
 textarea {
   width: 100%;
-  min-height: 200px;
-  resize: vertical;
+  height: 100%;
+  resize: none;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   font-size: 13px;
@@ -66,8 +67,9 @@ textarea {
   transition: background var(--transition), border-color var(--transition), color var(--transition);
   line-height: 1.4;
   white-space: pre;
+  overflow: auto;
 }
-.textarea-wrapper { position: relative; }
+.textarea-wrapper { position: relative; flex: 1; min-height: 0; }
 .line-nums {
   position: absolute;
   top: 0; left: 0;
@@ -88,7 +90,7 @@ textarea {
   white-space: pre;
 }
 .textarea-wrapper textarea { display: block; }
-.actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
 button {
   padding: 8px 12px;
   border: 1px solid var(--btn-border);
@@ -104,5 +106,5 @@ button {
 button:hover { background: var(--btn-hover); }
 button.primary { border-color: var(--accent); }
 .error { color: var(--error); margin-top: 8px; min-height: 20px; }
-.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 12px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px; gap: 12px; flex-shrink: 0; }
 .toolbar-right { display: flex; gap: 8px; }
