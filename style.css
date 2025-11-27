@@ -1,5 +1,7 @@
 * { box-sizing: border-box; }
 
+html, body { height: 100%; margin: 0; }
+
 :root {
   --bg: #f7f7f9;
   --text: #222;
@@ -34,7 +36,6 @@
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
     "Noto Sans", "Microsoft YaHei", sans-serif;
-  margin: 0;
   background: var(--bg);
   color: var(--text);
   transition: background var(--transition), color var(--transition);
