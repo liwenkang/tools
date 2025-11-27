@@ -74,6 +74,7 @@ textarea {
 .line-nums {
   position: absolute;
   top: 0; left: 0;
+  bottom: 0;
   width: 34px;
   padding: 10px 4px;
   border-right: 1px solid var(--panel-border);
@@ -87,8 +88,14 @@ textarea {
   color: var(--muted);
   background: var(--panel-bg);
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   white-space: pre;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.line-nums::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
 }
 .textarea-wrapper textarea { display: block; }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
