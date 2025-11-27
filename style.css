@@ -85,6 +85,7 @@ textarea {
   background: var(--panel-bg);
   box-sizing: border-box;
   overflow: hidden;
+  white-space: pre;
 }
 .textarea-wrapper textarea { display: block; }
 .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }

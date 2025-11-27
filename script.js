@@ -60,9 +60,9 @@
 
   function updateLineNums(textarea, gutter) {
     const lines = textarea.value.split('\n').length || 1;
-    let buf = '';
-    for (let i = 1; i <= lines; i++) buf += i + '\n';
-    gutter.textContent = buf;
+    const nums = [];
+    for (let i = 1; i <= lines; i++) nums.push(i);
+    gutter.textContent = nums.join('\n');
     gutter.scrollTop = textarea.scrollTop;
   }
   const $inputLines = document.getElementById('input-lines');
