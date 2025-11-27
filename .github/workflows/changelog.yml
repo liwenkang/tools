@@ -18,10 +18,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Generate changelog
+      - name: Generate changelog & release notes
         run: |
           npm install --no-package-lock --no-save || true
-          npm run changelog
+          npm run release:gen
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:

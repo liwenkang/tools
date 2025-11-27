@@ -88,20 +88,20 @@
           i--;
         }
       }
-      // 去尾逗号：,\s*[}\]]
-      if (!inS && !inD && ch === ',') {
+      if (!inS && !inD && text[i] === ',') {
         let j = i + 1;
         while (j < text.length && /\s/.test(text[j])) j++;
         if (j < text.length && (text[j] === '}' || text[j] === ']')) {
           // 跳过这个逗号
-          i = j - 1;
           continue;
         }
       }
-      out += ch;
-      esc = (ch === '\\' && !esc);
-      if (ch !== '\\') esc = false;
+      out += text[i];
+      esc = (text[i] === '\\' && !esc);
+      if (text[i] !== '\\') esc = false;
     }
+    // 末尾逗号特殊处理：如 {...,}\n 或 [...,]\n
+    out = out.replace(/,\s*([}\]])/g, '$1');
     return out;
   }
 
@@ -120,12 +120,52 @@
     let s = stripComments(raw);
     s = convertSingleQuotes(s);
     s = quoteUnquotedKeys(s);
+    // 失败定位辅助：计算可能的错误位置（行/列）
+    function locateError(str) {
+      let inS = false, inD = false, esc = false;
+      let brace = 0, bracket = 0;
+      let line = 1, col = 0;
+      let lastSuspiciousIdx = -1;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        if (ch === '\n') { line++; col = 0; } else { col++; }
+        if (!inS && !inD) {
+          if (ch === '{') brace++;
+          else if (ch === '}') { brace--; if (brace < 0) return { line, col, reason: '多余的 }' }; }
+          else if (ch === '[') bracket++;
+          else if (ch === ']') { bracket--; if (bracket < 0) return { line, col, reason: '多余的 ]' }; }
+        }
+        if (!inD && ch === '\'' && !esc) inS = !inS;
+        else if (!inS && ch === '"' && !esc) inD = !inD;
+        esc = (ch === '\\' && !esc);
+        if (ch !== '\\') esc = false;
+        // 记录疑似问题字符位置：逗号后紧跟逗号、冒号缺失等难以精准识别，留作最后位置
+        if (!inS && !inD && /[^\s\{\}\[\]\:\,\-0-9a-zA-Z_"\.]/.test(ch)) {
+          lastSuspiciousIdx = i;
+        }
+      }
+      if (inS || inD) return { line, col, reason: '字符串未闭合' };
+      if (brace > 0) return { line, col, reason: '缺少 }' };
+      if (bracket > 0) return { line, col, reason: '缺少 ]' };
+      if (lastSuspiciousIdx >= 0) {
+        // 回溯到可疑字符的行列
+        let l = 1, c = 0;
+        for (let i = 0; i <= lastSuspiciousIdx; i++) {
+          if (s[i] === '\n') { l++; c = 0; } else { c++; }
+        }
+        return { line: l, col: c, reason: '存在非法字符或结构' };
+      }
+      // 默认返回末尾位置
+      return { line, col, reason: '语法错误' };
+    }
     try {
       const obj = JSON.parse(s);
       if (obj && typeof obj === 'object' && !Array.isArray(obj)) return obj;
       throw new Error('仅支持对象（非数组）的对象字面量');
     } catch (e) {
-      throw new Error('解析失败：请检查输入是否为合法 JSON 或对象字面量');
+      const loc = locateError(s);
+      const hint = loc ? `（行 ${loc.line}，列 ${loc.col}：${loc.reason}）` : '';
+      throw new Error('解析失败：请检查输入是否为合法 JSON 或对象字面量 ' + hint);
     }
   }
 
@@ -205,5 +245,22 @@
     const raw = serialize(obj, 0);
     return raw;
   }
-  global.Sorter = { parseObject, charCategory, sortObjectKeys, sortedKeyList, toSortedJSON };
+  // 对象大小估算：统计键数量与嵌套深度（递归，只计算对象键，不含数组）
+  function estimateSize(obj) {
+    let keys = 0;
+    let maxDepth = 0;
+    function walk(o, depth) {
+      if (!o || typeof o !== 'object' || Array.isArray(o)) return;
+      if (depth > maxDepth) maxDepth = depth;
+      const ks = Object.keys(o);
+      keys += ks.length;
+      for (const k of ks) {
+        const v = o[k];
+        if (v && typeof v === 'object' && !Array.isArray(v)) walk(v, depth + 1);
+      }
+    }
+    walk(obj, 1);
+    return { keys, depth: maxDepth };
+  }
+  global.Sorter = { parseObject, charCategory, sortObjectKeys, sortedKeyList, toSortedJSON, estimateSize };
 })(typeof window !== 'undefined' ? window : globalThis);

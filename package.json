@@ -4,8 +4,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "test": "node tests/sort.test.js && node tests/parseObject.test.js && node tests/sort.edge.test.js",
-    "changelog": "node scripts/generate-changelog.js"
-    ,"release:gen": "node scripts/release.js"
+  "test": "node tests/sort.test.js && node tests/parseObject.test.js && node tests/sort.edge.test.js",
+  "release:gen": "node scripts/release.js"
   }
 }

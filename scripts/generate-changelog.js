@@ -16,8 +16,7 @@ function getTags() {
 
 function getCommits(sinceTag) {
   const range = sinceTag ? `${sinceTag}..HEAD` : 'HEAD';
-  const format = '%H|%s';
-  const out = sh(`git log ${range} --pretty=format:${format}`);
+  const out = sh(`git log ${range} --pretty="format:%H|%s"`);
   return out ? out.split(/\n/).filter(Boolean).map(line => {
     const [hash, subject] = line.split('|');
     return { hash, subject };

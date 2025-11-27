@@ -62,6 +62,15 @@
     showError("");
     try {
       const inputObj = parseInput($input.value);
+      // 性能风险提示：对象过大时提示
+      if (window.Sorter && typeof window.Sorter.estimateSize === 'function') {
+        const { keys, depth } = window.Sorter.estimateSize(inputObj);
+        const KEY_THRESHOLD = 1000; // 键数量阈值
+        const DEPTH_THRESHOLD = 10; // 最大嵌套层级阈值
+        if (keys > KEY_THRESHOLD || depth > DEPTH_THRESHOLD) {
+          showError(`提示：对象较大（键数：${keys}，层级：${depth}），排序/序列化可能较慢。`);
+        }
+      }
       const jsonStr = window.Sorter.toSortedJSON(inputObj);
       $output.value = jsonStr;
     } catch (err) {
@@ -83,6 +92,14 @@
     showError("");
     try {
       const inputObj = parseInput($input.value);
+      if (window.Sorter && typeof window.Sorter.estimateSize === 'function') {
+        const { keys, depth } = window.Sorter.estimateSize(inputObj);
+        const KEY_THRESHOLD = 1000;
+        const DEPTH_THRESHOLD = 10;
+        if (keys > KEY_THRESHOLD || depth > DEPTH_THRESHOLD) {
+          showError(`提示：对象较大（键数：${keys}，层级：${depth}），美化/排序可能较慢。`);
+        }
+      }
       // 美化但保持排序：重新生成排序后 JSON
       $input.value = window.Sorter.toSortedJSON(inputObj);
     } catch (err) {
