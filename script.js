@@ -97,7 +97,6 @@
   $convert.addEventListener("click", () => {
     showError("");
     try {
-      debugger;
       const inputObj = parseInput($input.value);
       const sorted = sortObjectKeys(inputObj);
       $output.value = toPrettyJSON(sorted);
