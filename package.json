@@ -1,0 +1,10 @@
+{
+  "name": "json-key-sorter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node tests/sort.test.js",
+    "changelog": "node scripts/generate-changelog.js"
+  }
+}

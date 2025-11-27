@@ -1,0 +1,10 @@
+<!doctype html><html lang="zh-cn"><head><meta charset="utf-8"/><title>Sorter 测试页</title></head><body><h1>Sorter 浏览器测试</h1><pre id="log"></pre><script src="sort.js"></script><script>
+function log(msg){document.getElementById('log').textContent += msg + "\n";}
+try {
+  const input = { a:1, Z:2, 你好:3, _x:4, '10':5, nested:{ b:2, A:1, _c:3 } };
+  const sorted = window.Sorter.sortObjectKeys(input);
+  log('排序结果键: ' + Object.keys(sorted).join(', '));
+  log('nested 键: ' + Object.keys(sorted.nested).join(', '));
+  log('测试完成');
+} catch (e) { log('错误: ' + e.message); }
+</script></body></html>

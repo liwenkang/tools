@@ -61,4 +61,33 @@ Start-Process "c:\code\tools\json_key_sort\index.html"
 - 页面 404：通常是缓存或工作流尚未完成，稍候刷新。
 - 样式未更新：确认最新提交已触发工作流，可在 `Actions` 查看执行记录。
 - 自定义构建：可在工作流中加入构建步骤（例如压缩、生成版本号注入）。
+## 测试与开发
+
+### 运行 Node 测试
+
+项目包含基础排序逻辑测试（无需依赖）：
+
+```bash
+npm test
+```
+
+### 浏览器快速验证
+
+打开 `test.html` 查看控制台与页面输出。
+
+## 自动变更日志
+
+脚本：`scripts/generate-changelog.js` 会根据 Conventional Commits 生成或更新 `CHANGELOG.md` 顶部的 `Unreleased` 段落。
+
+运行方式：
+
+```bash
+npm run changelog
+```
+
+工作流：推送符合 `v*` 模式的 tag 时触发 `.github/workflows/changelog.yml`，自动更新并提交最新未发布变更。
+
+约定：
+- 使用前缀（如 `feat:`、`fix:`、`docs:`）分类。
+- 未分类的提交归入 `其他`。
 
