@@ -11,14 +11,9 @@ function runTests() {
     '10': 5,
     nested: { b: 2, A: 1, _c: 3 },
   };
-  const sorted = global.Sorter.sortObjectKeys(input);
-  const keys = Object.keys(sorted);
-  // 实际实现：特殊符号(0) > 数字(1) > 大写(2) > 小写(3) > 中文(4)
-  // 同类别按 localeCompare；对象键遍历后 nested 属于小写类别之后的“中文”类别与其排序结果
-  // 当前排序结果为：数字 '10' 排在特殊符号 '_x' 前是因为 compareKeys 中返回 wa[0]-wb[0]，特殊符号类别值为0，数字为1，应当特殊符号在前；
-  // 但测试运行得到 ['10','_x',...] 说明实际分类逻辑需复查，这里我们以运行结果为准并记录 TODO：后续可写更精确断言。
-  assert.deepStrictEqual(keys, ['10', '_x', 'Z', 'a', 'nested', '你好']);
-  const nestedKeys = Object.keys(sorted.nested);
+  const keys = global.Sorter.sortedKeyList(input);
+  assert.deepStrictEqual(keys, ['_x', '10', 'Z', 'a', 'nested', '你好']);
+  const nestedKeys = global.Sorter.sortedKeyList(input.nested);
   assert.deepStrictEqual(nestedKeys, ['_c', 'A', 'b']);
   console.log('✔ 基本与递归排序测试通过');
 
@@ -33,6 +28,10 @@ function runTests() {
   assert.deepStrictEqual(Object.keys(mixedSorted.c), ['y','z'].sort((x,y)=> x.localeCompare(y)), '子对象排序');
   console.log('✔ 数组与子对象处理测试通过');
 
+  // 额外用例：再次验证特殊符号优先级
+  const extra = { '10': 1, _a: 2, A: 3 };
+  const extraKeys = global.Sorter.sortedKeyList(extra);
+  assert.deepStrictEqual(extraKeys, ['_a','10','A']);
   console.log('\n全部测试通过');
 }
 

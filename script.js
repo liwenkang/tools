@@ -36,8 +36,9 @@
     showError("");
     try {
       const inputObj = parseInput($input.value);
-      const sorted = window.Sorter.sortObjectKeys(inputObj);
-      $output.value = toPrettyJSON(sorted);
+      // 使用自定义序列化保持键排序规则（含整数索引键）
+      const jsonStr = window.Sorter.toSortedJSON(inputObj);
+      $output.value = jsonStr;
     } catch (err) {
       showError(err.message || String(err));
       $output.value = "";
@@ -48,7 +49,8 @@
     showError("");
     try {
       const inputObj = parseInput($input.value);
-      $input.value = toPrettyJSON(inputObj);
+      // 美化但保持排序：重新生成排序后 JSON
+      $input.value = window.Sorter.toSortedJSON(inputObj);
     } catch (err) {
       showError("美化失败：" + (err.message || String(err)));
     }

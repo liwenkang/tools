@@ -26,7 +26,16 @@
     return String(wa[1]).localeCompare(String(wb[1]));
   }
   function sortObjectKeys(obj) {
-    const keys = Object.keys(obj).sort(compareKeys);
+    const rawKeys = Object.keys(obj);
+    const buckets = [[], [], [], [], [], []]; // 0 特殊,1 数字,2 大写,3 小写,4 中文,5 兜底
+    for (const k of rawKeys) {
+      const cat = charCategory(k[0]);
+      buckets[cat].push(k);
+    }
+    for (const b of buckets) {
+      b.sort((a, b) => String(a).localeCompare(String(b)));
+    }
+    const keys = buckets.flat().filter(k => rawKeys.includes(k));
     const out = {};
     for (const k of keys) {
       const v = obj[k];
@@ -38,5 +47,34 @@
     }
     return out;
   }
-  global.Sorter = { charCategory, sortObjectKeys };
+  // 提供仅返回排序后的键列表（包含整数索引键也按规则自定义顺序）
+  function sortedKeyList(obj) {
+    const rawKeys = Object.keys(obj);
+    return rawKeys.map(k => ({ k, w: keyWeight(k) }))
+      .sort((a, b) => {
+        if (a.w[0] !== b.w[0]) return a.w[0] - b.w[0];
+        return String(a.w[1]).localeCompare(String(b.w[1]));
+      })
+      .map(x => x.k);
+  }
+  // 自定义 JSON 序列化，保持排序规则而不受对象枚举的整数索引提升影响
+  function toSortedJSON(obj, indent = 2) {
+    function serialize(o, level) {
+      if (!o || typeof o !== 'object' || Array.isArray(o)) return JSON.stringify(o);
+      const keys = sortedKeyList(o);
+      const pad = ' '.repeat(level * indent);
+      const padInner = ' '.repeat((level + 1) * indent);
+      const parts = keys.map(k => {
+        const v = o[k];
+        const valueStr = serialize(v, level + 1);
+        return `${padInner}${JSON.stringify(k)}: ${valueStr}`;
+      });
+      if (!parts.length) return '{}';
+      return `{$\n${parts.join(',\n')}$\n${pad}}`.replace(/\$\\n/g,'\n');
+    }
+    // 直接返回构造字符串（避免 JSON.parse 破坏顺序）
+    const raw = serialize(obj, 0);
+    return raw;
+  }
+  global.Sorter = { charCategory, sortObjectKeys, sortedKeyList, toSortedJSON };
 })(typeof window !== 'undefined' ? window : globalThis);
