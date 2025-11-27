@@ -72,7 +72,7 @@ textarea {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   font-size: 13px;
-  padding: 10px 10px 10px 44px; /* 留出行号栏 */
+  padding: 10px 10px 30px 44px; /* 留出行号栏，底部留出空间避免滚动条遮挡 */
   border: 1px solid var(--input-border);
   border-radius: 6px;
   background: transparent;
@@ -92,7 +92,7 @@ textarea::selection {
 .highlight-layer {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  padding: 10px 10px 10px 44px;
+  padding: 10px 10px 30px 44px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   font-size: 13px;
