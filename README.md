@@ -90,6 +90,27 @@ npm test
 
 脚本：`scripts/generate-changelog.js` 会根据 Conventional Commits 生成或更新 `CHANGELOG.md` 顶部的 `Unreleased` 段落。
 
+
+## 自动化发布（语义版本与 Release Notes）
+
+发布脚本：`scripts/release.js` 会根据自上一个 tag 以来的提交自动判断版本递增级别：
+- 含 `BREAKING CHANGE` 或 `feat!:`：主版本（major）+1
+- 含 `feat:`（非破坏）：次版本（minor）+1
+- 其他（`fix:`、`perf:` 等）：补丁（patch）+1
+
+生成内容：
+- 建议的新版本号（形如 `vX.Y.Z`）
+- 分组的提交说明（新增 / 修复 / 重构 / 文档等）写入 `RELEASE_NOTES.md`
+- 更新 `CHANGELOG.md` 顶部的 `Unreleased` 段落（若存在）
+
+工作流：`.github/workflows/release.yml` 在推送以 `v*` 命名的 tag 时自动：
+1. 拉取仓库并运行 `npm run release:gen`
+2. 读取生成的 `RELEASE_NOTES.md`
+3. 创建 GitHub Release（使用 `softprops/action-gh-release`）
+
+使用步骤：
+```bash
+# 1. 查看建议版本（先不打 tag）
 运行方式：
 
 ```bash
@@ -97,6 +118,8 @@ npm run changelog
 ```
 
 工作流：推送符合 `v*` 模式的 tag 时触发 `.github/workflows/changelog.yml`，自动更新并提交最新未发布变更。
+
+注意：首次没有旧 tag 时，将从 `v0.0.0` 推导；若需要调整版本策略，可在创建 tag 前手动修改。建议严格使用 Conventional Commits 以保证分类准确性。
 
 约定：
 - 使用前缀（如 `feat:`、`fix:`、`docs:`）分类。
