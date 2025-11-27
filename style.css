@@ -58,13 +58,35 @@ textarea {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   font-size: 13px;
-  padding: 10px;
+  padding: 10px 10px 10px 44px; /* 留出行号栏 */
   border: 1px solid var(--input-border);
   border-radius: 6px;
   background: var(--input-bg);
   color: var(--text);
   transition: background var(--transition), border-color var(--transition), color var(--transition);
+  line-height: 1.4;
+  white-space: pre;
 }
+.textarea-wrapper { position: relative; }
+.line-nums {
+  position: absolute;
+  top: 0; left: 0;
+  width: 34px;
+  padding: 10px 4px;
+  border-right: 1px solid var(--panel-border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: right;
+  user-select: none;
+  pointer-events: none;
+  color: var(--muted);
+  background: var(--panel-bg);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.textarea-wrapper textarea { display: block; }
 .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 button {
   padding: 8px 12px;

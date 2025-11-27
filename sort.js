@@ -239,7 +239,7 @@
         return `${padInner}${JSON.stringify(k)}: ${valueStr}`;
       });
       if (!parts.length) return '{}';
-      return `{$\n${parts.join(',\n')}$\n${pad}}`.replace(/\$\\n/g,'\n');
+      return '{\n' + parts.join(',\n') + '\n' + pad + '}';
     }
     // 直接返回构造字符串（避免 JSON.parse 破坏顺序）
     const raw = serialize(obj, 0);

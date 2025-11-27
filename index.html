@@ -24,7 +24,7 @@
 
     <section class="panel">
       <label for="input" data-i18n="inputLabel">输入</label>
-      <textarea id="input" placeholder="示例：\n{\n  a: 1,\n  'Z': 2,\n  你好: 3,\n  _x: 4,\n  '10': 5\n}\n或标准 JSON：\n{\n  \"a\": 1,\n  \"Z\": 2,\n  \"你好\": 3,\n  \"_x\": 4,\n  \"10\": 5\n}" autofocus></textarea>
+      <div class="textarea-wrapper"><div class="line-nums" aria-hidden="true" id="input-lines"></div><textarea id="input" placeholder="示例：\n{\n  a: 1,\n  'Z': 2,\n  你好: 3,\n  _x: 4,\n  '10': 5\n}\n或标准 JSON：\n{\n  \"a\": 1,\n  \"Z\": 2,\n  \"你好\": 3,\n  \"_x\": 4,\n  \"10\": 5\n}" autofocus></textarea></div>
       <div class="actions">
         <button id="convert" data-i18n="convertBtn">转换并排序键</button>
         <button id="format" data-i18n="formatBtn">美化输入</button>
@@ -34,7 +34,7 @@
 
     <section class="panel">
       <label for="output" data-i18n="outputLabel">输出（已按规则排序的对象）</label>
-      <textarea id="output" readonly></textarea>
+      <div class="textarea-wrapper"><div class="line-nums" aria-hidden="true" id="output-lines"></div><textarea id="output" readonly></textarea></div>
     </section>
   </main>
 

@@ -58,11 +58,29 @@
     });
   }
 
+  function updateLineNums(textarea, gutter) {
+    const lines = textarea.value.split('\n').length || 1;
+    let buf = '';
+    for (let i = 1; i <= lines; i++) buf += i + '\n';
+    gutter.textContent = buf;
+    gutter.scrollTop = textarea.scrollTop;
+  }
+  const $inputLines = document.getElementById('input-lines');
+  const $outputLines = document.getElementById('output-lines');
+  function attachLineEvents(textarea, gutter){
+    if(!textarea || !gutter) return;
+    textarea.addEventListener('input', ()=> updateLineNums(textarea, gutter));
+    textarea.addEventListener('scroll', ()=> { gutter.scrollTop = textarea.scrollTop; });
+    updateLineNums(textarea, gutter);
+  }
+  attachLineEvents($input, $inputLines);
+  attachLineEvents($output, $outputLines);
+
   function doConvert() {
     showError("");
     try {
       const inputObj = parseInput($input.value);
-      // 性能风险提示：对象过大时提示
+      // 性能风险提示：对象较大时提示
       if (window.Sorter && typeof window.Sorter.estimateSize === 'function') {
         const { keys, depth } = window.Sorter.estimateSize(inputObj);
         const KEY_THRESHOLD = 1000; // 键数量阈值
@@ -73,9 +91,11 @@
       }
       const jsonStr = window.Sorter.toSortedJSON(inputObj);
       $output.value = jsonStr;
+      updateLineNums($output, $outputLines);
     } catch (err) {
       showError(err.message || String(err));
       $output.value = "";
+      updateLineNums($output, $outputLines);
     }
   }
 
@@ -102,6 +122,7 @@
       }
       // 美化但保持排序：重新生成排序后 JSON
       $input.value = window.Sorter.toSortedJSON(inputObj);
+      updateLineNums($input, $inputLines);
     } catch (err) {
       showError("美化失败：" + (err.message || String(err)));
     }
