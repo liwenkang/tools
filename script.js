@@ -9,23 +9,9 @@
     $error.textContent = msg || "";
   }
 
-  // 解析输入（兼容 JSON 与对象字面量）
+  // 解析输入（更安全的对象字面量解析）
   function parseInput(text) {
-    text = (text || "").trim();
-    if (!text) throw new Error("请输入内容");
-    try {
-      const obj = JSON.parse(text);
-      if (obj && typeof obj === "object" && !Array.isArray(obj)) return obj;
-      throw new Error("仅支持对象（非数组）的 JSON");
-    } catch (_) {}
-    const wrapped = `(\"use strict\"),(${text})`;
-    try {
-      const obj = Function(`return ${wrapped}`)();
-      if (obj && typeof obj === "object" && !Array.isArray(obj)) return obj;
-      throw new Error("仅支持对象（非数组）的 JS 对象字面量");
-    } catch (e) {
-      throw new Error("解析失败：请检查输入是否为合法 JSON 或对象字面量");
-    }
+    return window.Sorter.parseObject(text);
   }
 
   function toPrettyJSON(obj) {

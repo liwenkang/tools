@@ -1,5 +1,134 @@
 // 排序逻辑独立模块：暴露 Sorter 到全局（browser）
 (function (global) {
+  // --- 安全对象字面量解析（无执行） ---
+  function stripComments(text) {
+    let out = '';
+    let inS = false, inD = false, esc = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      const next = text[i+1];
+      if (!inS && !inD && ch === '/' && next === '/') {
+        while (i < text.length && text[i] !== '\n') i++;
+        out += '\n';
+        continue;
+      }
+      if (!inS && !inD && ch === '/' && next === '*') {
+        i += 2;
+        while (i < text.length && !(text[i] === '*' && text[i+1] === '/')) i++;
+        i++; // 跳过 '/'
+        continue;
+      }
+      if (!inD && ch === '\'' && !esc) inS = !inS;
+      else if (!inS && ch === '"' && !esc) inD = !inD;
+      esc = (ch === '\\' && !esc);
+      if (ch !== '\\') esc = false;
+      out += ch;
+    }
+    return out;
+  }
+
+  function convertSingleQuotes(text) {
+    let out = '';
+    let inS = false, inD = false, esc = false;
+    for (let i = 0; i < text.length; i++) {
+      let ch = text[i];
+      if (!inD && ch === '\'' && !esc) {
+        // 开始/结束 单引号字符串
+        inS = !inS;
+        out += '"';
+        esc = false;
+        continue;
+      }
+      if (!inS && ch === '"' && !esc) inD = !inD;
+      if (inS) {
+        if (ch === '"') { out += '\\"'; }
+        else if (ch === '\\') { out += '\\\\'; }
+        else { out += ch; }
+      } else {
+        out += ch;
+      }
+      esc = (ch === '\\' && !esc);
+      if (ch !== '\\') esc = false;
+    }
+    return out;
+  }
+
+  function quoteUnquotedKeys(text) {
+    let out = '';
+    let inS = false, inD = false, esc = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (!inD && ch === '\'' && !esc) { inS = !inS; out += ch; esc = false; continue; }
+      if (!inS && ch === '"' && !esc) { inD = !inD; out += ch; esc = false; continue; }
+      if (!inS && !inD && (ch === '{' || ch === ',')) {
+        out += ch;
+        i++;
+        while (i < text.length && /\s/.test(text[i])) { out += text[i]; i++; }
+        if (text[i] === '"') { out += '"'; continue; }
+        // 识别未引号键
+        const start = i;
+        const isIdStart = /[A-Za-z_$\u4E00-\u9FFF]/.test(text[i] || '');
+        if (isIdStart) {
+          i++;
+          while (i < text.length && /[A-Za-z0-9_$\u4E00-\u9FFF]/.test(text[i])) i++;
+          const key = text.slice(start, i);
+          let j = i;
+          while (j < text.length && /\s/.test(text[j])) j++;
+          if (text[j] === ':') {
+            out += '"' + key + '"';
+            while (i < j) { out += text[i]; i++; }
+            out += ':';
+            continue;
+          } else {
+            out += key;
+            i = j - 1;
+            continue;
+          }
+        } else {
+          i--;
+        }
+      }
+      // 去尾逗号：,\s*[}\]]
+      if (!inS && !inD && ch === ',') {
+        let j = i + 1;
+        while (j < text.length && /\s/.test(text[j])) j++;
+        if (j < text.length && (text[j] === '}' || text[j] === ']')) {
+          // 跳过这个逗号
+          i = j - 1;
+          continue;
+        }
+      }
+      out += ch;
+      esc = (ch === '\\' && !esc);
+      if (ch !== '\\') esc = false;
+    }
+    return out;
+  }
+
+  function parseObject(text) {
+    const raw = (text || '').trim();
+    if (!raw) throw new Error('请输入内容');
+    try {
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj === 'object' && !Array.isArray(obj)) return obj;
+      throw new Error('仅支持对象（非数组）的 JSON');
+    } catch (_) {}
+
+    if (!(raw.startsWith('{') && raw.endsWith('}'))) {
+      throw new Error('对象字面量需以 { } 包裹');
+    }
+    let s = stripComments(raw);
+    s = convertSingleQuotes(s);
+    s = quoteUnquotedKeys(s);
+    try {
+      const obj = JSON.parse(s);
+      if (obj && typeof obj === 'object' && !Array.isArray(obj)) return obj;
+      throw new Error('仅支持对象（非数组）的对象字面量');
+    } catch (e) {
+      throw new Error('解析失败：请检查输入是否为合法 JSON 或对象字面量');
+    }
+  }
+
   function charCategory(ch) {
     if (!ch) return 5;
     const code = ch.codePointAt(0);
@@ -76,5 +205,5 @@
     const raw = serialize(obj, 0);
     return raw;
   }
-  global.Sorter = { charCategory, sortObjectKeys, sortedKeyList, toSortedJSON };
+  global.Sorter = { parseObject, charCategory, sortObjectKeys, sortedKeyList, toSortedJSON };
 })(typeof window !== 'undefined' ? window : globalThis);
