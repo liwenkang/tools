@@ -75,8 +75,8 @@ textarea {
   padding: 10px 10px 10px 44px; /* 留出行号栏 */
   border: 1px solid var(--input-border);
   border-radius: 6px;
-  background: var(--input-bg);
-  color: var(--text);
+  background: transparent;
+  color: transparent;
   transition: background var(--transition), border-color var(--transition), color var(--transition);
   line-height: 1.4;
   white-space: pre;
@@ -84,7 +84,9 @@ textarea {
   position: relative;
   z-index: 1;
   caret-color: var(--text);
-  -webkit-text-fill-color: transparent;
+}
+textarea::selection {
+  background: rgba(100, 149, 237, 0.3);
 }
 .textarea-wrapper { position: relative; flex: 1; min-height: 0; }
 .highlight-layer {
@@ -98,10 +100,11 @@ textarea {
   white-space: pre;
   overflow: auto;
   pointer-events: none;
-  color: transparent;
   border: 1px solid transparent;
   border-radius: 6px;
   box-sizing: border-box;
+  background: var(--input-bg);
+  z-index: 0;
 }
 .highlight-layer::-webkit-scrollbar { display: none; }
 .highlight-layer { scrollbar-width: none; -ms-overflow-style: none; }
