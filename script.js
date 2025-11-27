@@ -18,16 +18,24 @@
     return JSON.stringify(obj, null, 2);
   }
 
-  $convert.addEventListener("click", () => {
+  function doConvert() {
     showError("");
     try {
       const inputObj = parseInput($input.value);
-      // 使用自定义序列化保持键排序规则（含整数索引键）
       const jsonStr = window.Sorter.toSortedJSON(inputObj);
       $output.value = jsonStr;
     } catch (err) {
       showError(err.message || String(err));
       $output.value = "";
+    }
+  }
+
+  $convert.addEventListener("click", doConvert);
+
+  $input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      doConvert();
+      e.preventDefault();
     }
   });
 
