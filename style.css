@@ -130,6 +130,8 @@ textarea::selection {
   white-space: pre;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+  z-index: 2;
+}
 }
 .line-nums::-webkit-scrollbar {
   display: none; /* Chrome/Safari/Opera */
